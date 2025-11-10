@@ -62,9 +62,45 @@ class Reminders(MangoCog):
 
         current_total = mm * 60 + ss
 
+        # ---- Flatten events from JSON structure -----------------------
+        events = []
+        
+        # Handle bounty runes
+        if "bounty_runes" in match_timings and isinstance(match_timings["bounty_runes"], list):
+            for time_str in match_timings["bounty_runes"]:
+                events.append({"time": time_str, "message": f"Bounty rune spawn: {time_str}"})
+        
+        # Handle power runes
+        if "power_runes" in match_timings and isinstance(match_timings["power_runes"], list):
+            for time_str in match_timings["power_runes"]:
+                events.append({"time": time_str, "message": f"Power rune spawn: {time_str}"})
+        
+        # Handle wisdom runes
+        if "wisdom_runes" in match_timings and isinstance(match_timings["wisdom_runes"], list):
+            for time_str in match_timings["wisdom_runes"]:
+                events.append({"time": time_str, "message": f"Wisdom rune spawn: {time_str}"})
+        
+        # Handle torghast lotus
+        if "torghast_lotus" in match_timings and isinstance(match_timings["torghast_lotus"], dict):
+            if "spawn" in match_timings["torghast_lotus"] and isinstance(match_timings["torghast_lotus"]["spawn"], list):
+                for time_str in match_timings["torghast_lotus"]["spawn"]:
+                    events.append({"time": time_str, "message": f"Torghast Lotus spawn: {time_str}"})
+        
+        # Handle water runes
+        if "water_runes" in match_timings and isinstance(match_timings["water_runes"], dict):
+            if "spawn" in match_timings["water_runes"] and isinstance(match_timings["water_runes"]["spawn"], list):
+                for time_str in match_timings["water_runes"]["spawn"]:
+                    events.append({"time": time_str, "message": f"Water rune spawn: {time_str}"})
+        
+        # Handle outposts
+        if "outposts" in match_timings and isinstance(match_timings["outposts"], dict):
+            if "capture_available" in match_timings["outposts"]:
+                time_str = match_timings["outposts"]["capture_available"]
+                events.append({"time": time_str, "message": f"Outposts available for capture: {time_str}"})
+        
         # ---- Schedule future events ------------------------------------
         scheduled = 0
-        for ev in match_timings:
+        for ev in events:
             try:
                 ev_mm, ev_ss = map(int, ev["time"].split(":"))
                 ev_total = ev_mm * 60 + ev_ss
