@@ -19,12 +19,13 @@ class Reminders(MangoCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    async def send_reminder_after_delay(self, channel: disnake.TextChannel, message: str, delay: int):
-        """Sleep and then send the reminder."""
+    async def send_reminder_after_delay(self, guild: disnake.Guild, message: str, delay: int):
+        """Sleep and then send the reminder via TTS."""
         await asyncio.sleep(delay)
         try:
-            await channel.send(message)
-        except disnake.HTTPException as e:
+            audio_cog = self.bot.get_cog("Audio")
+            await audio_cog.do_tts(message, guild)
+        except Exception as e:
             logger.error(f"Failed to send reminder: {e}")
 
     @commands.slash_command(
@@ -62,6 +63,14 @@ class Reminders(MangoCog):
 
         current_total = mm * 60 + ss
 
+        # ---- Play startup TTS -----------------------------------------
+        try:
+            audio_cog = self.bot.get_cog("Audio")
+            if audio_cog:
+                await audio_cog.do_tts(f"Starting reminders at {current_time}", inter.guild)
+        except Exception as e:
+            logger.error(f"Failed to play startup TTS: {e}")
+
         # ---- Flatten events from JSON structure -----------------------
         events = []
         
@@ -92,12 +101,6 @@ class Reminders(MangoCog):
                 for time_str in match_timings["water_runes"]["spawn"]:
                     events.append({"time": time_str, "message": f"Water rune spawn: {time_str}"})
         
-        # Handle outposts
-        if "outposts" in match_timings and isinstance(match_timings["outposts"], dict):
-            if "capture_available" in match_timings["outposts"]:
-                time_str = match_timings["outposts"]["capture_available"]
-                events.append({"time": time_str, "message": f"Outposts available for capture: {time_str}"})
-        
         # ---- Schedule future events ------------------------------------
         scheduled = 0
         for ev in events:
@@ -108,7 +111,7 @@ class Reminders(MangoCog):
                 if ev_total > current_total:
                     delay = ev_total - current_total
                     self.bot.loop.create_task(
-                        self.send_reminder_after_delay(inter.channel, ev["message"], delay)
+                        self.send_reminder_after_delay(inter.guild, ev["message"], delay)
                     )
                     scheduled += 1
             except (KeyError, ValueError) as e:
