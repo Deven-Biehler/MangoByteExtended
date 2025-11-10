@@ -78,7 +78,7 @@ class Reminders(commands.Cog):
                 logger.warning(f"Skipping malformed event entry: {e}")
                 continue
 
-        await inter.send(f"Scheduled **{scheduled}** reminder(s).")
+        await inter.followup.send(f"Scheduled **{scheduled}** reminder(s).")
 
 # ----------------------------------------------------------------------
 def setup(bot: commands.Bot):
