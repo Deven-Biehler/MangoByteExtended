@@ -757,5 +757,42 @@ class Audio(MangoCog):
 		botdata.userinfo(inter.author)[target] = clipid
 		await inter.send(f"✅ {target} has been set!")
 
+	async def send_reminder_after_delay(self, channel: disnake.TextChannel, message: str, delay: int):
+		await asyncio.sleep(delay)
+		await channel.send(message)
+
+	@commands.slash_command()
+	async def startReminders(self, inter: disnake.CmdInter, current_time: str):
+		"""Uses hard-coded data to start reminders for various events during a match.
+		
+		Parameters
+		----------
+		current_time: The current time in the match, in MM:SS format
+		"""
+		match_timings_path = settings.resource("json/match_timings.json")
+		match_timings = read_json(match_timings_path)
+		current_time_parts = current_time.split(":")
+		if len(current_time_parts) != 2:
+			raise UserError("Current time must be in MM:SS format")
+		current_minutes = int(current_time_parts[0])
+		current_seconds = int(current_time_parts[1])
+		current_total_seconds = current_minutes * 60 + current_seconds
+
+		for event in match_timings:
+			event_time_parts = event["time"].split(":")
+			event_minutes = int(event_time_parts[0])
+			event_seconds = int(event_time_parts[1])
+			event_total_seconds = event_minutes * 60 + event_seconds
+
+			if event_total_seconds > current_total_seconds:
+				delay = event_total_seconds - current_total_seconds
+				self.bot.loop.create_task(self.send_reminder_after_delay(inter.channel, event["message"], delay))
+
+
+
+
+		
+
+
 def setup(bot):
 	bot.add_cog(Audio(bot))

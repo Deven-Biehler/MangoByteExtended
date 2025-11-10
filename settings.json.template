@@ -1,0 +1,8 @@
+{
+  "token": "${DISCORD_TOKEN}",
+  "stratz": "${STRATZ_TOKEN}",
+  "odota": "",
+  "debug": false,
+  "ttslang": "en",
+  "defaultvoice": 123456789012345678
+}
