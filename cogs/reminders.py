@@ -18,6 +18,7 @@ def read_json(path: str) -> list[dict]:
 class Reminders(MangoCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.scheduled_tasks = {}  # Store tasks by guild_id for cancellation
 
     async def send_reminder_after_delay(self, guild: disnake.Guild, message: str, delay: int):
         """Sleep and then send the reminder via TTS."""
@@ -104,6 +105,9 @@ class Reminders(MangoCog):
         
         # ---- Schedule future events ------------------------------------
         scheduled = 0
+        if inter.guild.id not in self.scheduled_tasks:
+            self.scheduled_tasks[inter.guild.id] = []
+        
         for ev in events:
             try:
                 ev_mm, ev_ss = map(int, ev["time"].split(":"))
@@ -111,15 +115,37 @@ class Reminders(MangoCog):
 
                 if ev_total > current_total:
                     delay = ev_total - current_total - time_before
-                    self.bot.loop.create_task(
+                    task = self.bot.loop.create_task(
                         self.send_reminder_after_delay(inter.guild, ev["message"], delay)
                     )
+                    self.scheduled_tasks[inter.guild.id].append(task)
                     scheduled += 1
             except (KeyError, ValueError) as e:
                 logger.warning(f"Skipping malformed event entry: {e}")
                 continue
 
         await inter.followup.send(f"Scheduled **{scheduled}** reminder(s).")
+
+    @commands.slash_command(
+        name="cancelreminders",
+        description="Cancel all queued reminders for this server."
+    )
+    async def cancel_reminders(self, inter: disnake.ApplicationCommandInteraction):
+        """Cancel all pending reminders."""
+        await safe_defer(inter)
+
+        guild_id = inter.guild.id
+        if guild_id not in self.scheduled_tasks or not self.scheduled_tasks[guild_id]:
+            raise UserError("No reminders are currently scheduled.")
+
+        cancelled = 0
+        for task in self.scheduled_tasks[guild_id]:
+            if not task.done():
+                task.cancel()
+                cancelled += 1
+
+        self.scheduled_tasks[guild_id] = []
+        await inter.followup.send(f"Cancelled **{cancelled}** reminder(s).")
 
 # ----------------------------------------------------------------------
 def setup(bot: commands.Bot):
