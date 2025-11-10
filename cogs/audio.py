@@ -761,52 +761,6 @@ class Audio(MangoCog):
 		await asyncio.sleep(delay)
 		await channel.send(message)
 
-	@commands.slash_command(name="startreminders")
-	async def startReminders(self, inter: disnake.CmdInter, current_time: str):
-		"""Uses hard-coded data to start reminders for various events during a match.
-		
-		Parameters
-		----------
-		current_time: The current time in the match, in MM:SS format
-		"""
-		await self.safe_defer(inter)
-		
-		match_timings_path = settings.resource("json/match_timings.json")
-		match_timings = read_json(match_timings_path)
-		current_time_parts = current_time.split(":")
-		if len(current_time_parts) != 2:
-			raise UserError("Current time must be in MM:SS format")
-		
-		try:
-			current_minutes = int(current_time_parts[0])
-			current_seconds = int(current_time_parts[1])
-		except ValueError:
-			raise UserError("Time values must be valid integers")
-		
-		current_total_seconds = current_minutes * 60 + current_seconds
-		reminders_scheduled = 0
-
-		for event in match_timings:
-			try:
-				event_time_parts = event["time"].split(":")
-				if len(event_time_parts) != 2:
-					continue
-				event_minutes = int(event_time_parts[0])
-				event_seconds = int(event_time_parts[1])
-				event_total_seconds = event_minutes * 60 + event_seconds
-
-				if event_total_seconds > current_total_seconds:
-					delay = event_total_seconds - current_total_seconds
-					self.bot.loop.create_task(self.send_reminder_after_delay(inter.channel, event["message"], delay))
-					reminders_scheduled += 1
-			except (ValueError, KeyError) as e:
-				logger.error(f"Error processing event: {e}")
-				continue
-		
-		await inter.send(f"Scheduled {reminders_scheduled} reminder(s)")
-
-
-
 
 		
 
