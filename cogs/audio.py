@@ -761,7 +761,7 @@ class Audio(MangoCog):
 		await asyncio.sleep(delay)
 		await channel.send(message)
 
-	@commands.slash_command()
+	@commands.slash_command(name="startreminders")
 	async def startReminders(self, inter: disnake.CmdInter, current_time: str):
 		"""Uses hard-coded data to start reminders for various events during a match.
 		
