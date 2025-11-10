@@ -16,4 +16,4 @@ python-dateutil>=2.8.1
 orjson>=3.7.2
 tinydb>=4.8.0
 SQLAlchemy-Utils>=0.41.1
-pyzt
+pytz
