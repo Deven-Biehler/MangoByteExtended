@@ -5,8 +5,8 @@ import json
 import logging
 
 from utils.tools.settings import settings
+from utils.tools.helpers import safe_defer
 from utils.command.botdatatypes import UserError
-from utils.command.checks import safe_defer
 
 logger = logging.getLogger(__name__)
 
