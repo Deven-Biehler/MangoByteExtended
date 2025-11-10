@@ -35,7 +35,8 @@ class Reminders(MangoCog):
     async def start_reminders(
         self,
         inter: disnake.ApplicationCommandInteraction,
-        current_time: str = commands.Param(description="Current match time (MM:SS)")
+        current_time: str = commands.Param(default="00:00", description="Current match time (MM:SS)"),
+        time_before: int = commands.Param(default=0, description="Optional time ahead in seconds to adjust reminders")
     ):
         """
         Parameters
@@ -77,29 +78,29 @@ class Reminders(MangoCog):
         # Handle bounty runes
         if "bounty_runes" in match_timings and isinstance(match_timings["bounty_runes"], list):
             for time_str in match_timings["bounty_runes"]:
-                events.append({"time": time_str, "message": f"Bounty rune spawn: {time_str}"})
+                events.append({"time": time_str, "message": f"Bounty runes in {time_before} seconds"})
         
         # Handle power runes
         if "power_runes" in match_timings and isinstance(match_timings["power_runes"], list):
             for time_str in match_timings["power_runes"]:
-                events.append({"time": time_str, "message": f"Power rune spawn: {time_str}"})
+                events.append({"time": time_str, "message": f"Power runes in {time_before} seconds"})
         
         # Handle wisdom runes
         if "wisdom_runes" in match_timings and isinstance(match_timings["wisdom_runes"], list):
             for time_str in match_timings["wisdom_runes"]:
-                events.append({"time": time_str, "message": f"Wisdom rune spawn: {time_str}"})
+                events.append({"time": time_str, "message": f"Wisdom runes in {time_before} seconds"})
         
         # Handle torghast lotus
         if "torghast_lotus" in match_timings and isinstance(match_timings["torghast_lotus"], dict):
             if "spawn" in match_timings["torghast_lotus"] and isinstance(match_timings["torghast_lotus"]["spawn"], list):
                 for time_str in match_timings["torghast_lotus"]["spawn"]:
-                    events.append({"time": time_str, "message": f"Torghast Lotus spawn: {time_str}"})
+                    events.append({"time": time_str, "message": f"Lotus in {time_before} seconds"})
         
         # Handle water runes
         if "water_runes" in match_timings and isinstance(match_timings["water_runes"], dict):
             if "spawn" in match_timings["water_runes"] and isinstance(match_timings["water_runes"]["spawn"], list):
                 for time_str in match_timings["water_runes"]["spawn"]:
-                    events.append({"time": time_str, "message": f"Water rune spawn: {time_str}"})
+                    events.append({"time": time_str, "message": f"Water rune in {time_before} seconds"})
         
         # ---- Schedule future events ------------------------------------
         scheduled = 0
@@ -109,7 +110,7 @@ class Reminders(MangoCog):
                 ev_total = ev_mm * 60 + ev_ss
 
                 if ev_total > current_total:
-                    delay = ev_total - current_total
+                    delay = ev_total - current_total - time_before
                     self.bot.loop.create_task(
                         self.send_reminder_after_delay(inter.guild, ev["message"], delay)
                     )
