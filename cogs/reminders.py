@@ -7,6 +7,7 @@ import logging
 from utils.tools.settings import settings
 from utils.tools.helpers import safe_defer
 from utils.command.botdatatypes import UserError
+from cogs.mangocog import MangoCog
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ def read_json(path: str) -> list[dict]:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-class Reminders(commands.Cog):
+class Reminders(MangoCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
