@@ -1,21 +1,19 @@
 {
   "game_start": "0:00",
-  "bounty_runes": [
+  "bounty_runes": {
+    "spawn": [
     "0:00",
-    "3:00",
-    "6:00",
-    "9:00",
-    "12:00",
-    "15:00",
-    "18:00",
-    "21:00",
-    "24:00",
-    "27:00",
-    "30:00"
-  ],
-  "power_runes": [
-    "2:00",
     "4:00",
+    "8:00",
+    "12:00",
+    "16:00",
+    "20:00",
+    "24:00",
+    "28:00"
+    ],
+    "sound": "resource/clips/sounds/Items_rune_bounty.mp3"
+  },
+  "power_runes": [
     "6:00",
     "8:00",
     "10:00",
@@ -36,44 +34,14 @@
     "21:00",
     "28:00"
   ],
-  "roshan": {
-    "first_possible_kill": "6:00",
-    "respawn_min": "8:00",
-    "respawn_max": "11:00"
-  },
-  "day_night_cycle": {
-    "day_start": "0:00",
-    "night_start": "5:00",
-    "cycle_length": "5:00"
-  },
-  "neutral_creeps": {
-    "spawn": {
-      "initial": "1:00",
-      "respawn_every": "1:00"
-    },
-    "ancient_camp_spawn": "2:00"
-  },
-  "outposts": {
-    "capture_available": "10:00"
-  },
-  "torghast_lotus": {
-    "spawn": [
+  "torghast_lotus": [
       "3:00",
       "6:00",
       "9:00"
-    ]
-  },
-  "water_runes": {
-    "spawn": [
-      "2:00",
-      "4:00"
-    ]
-  },
-  "notes": [
-    "All times are from game horn (0:00).",
-    "Power Runes replace Water Runes at even minutes starting 2:00.",
-    "Wisdom Runes appear at minute 7, 14, 21, etc.",
-    "Roshan respawn is random between 8–11 minutes after death.",
-    "Use this JSON in bots, overlays, or timers — parse and compute countdowns."
+    ],
+  "water_runes": 
+  [
+    "2:00",
+    "4:00"
   ]
 }

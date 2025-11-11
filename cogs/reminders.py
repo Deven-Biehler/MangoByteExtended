@@ -29,6 +29,9 @@ class Reminders(MangoCog):
         except Exception as e:
             logger.error(f"Failed to send reminder: {e}")
 
+    async def get_clip(self, clipid, clip_ctx):
+        return await super().get_clip(clipid, clip_ctx)
+
     @commands.slash_command(
         name="startreminders",
         description="Start in-game event reminders from the current match time."
